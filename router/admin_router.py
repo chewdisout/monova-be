@@ -6,11 +6,12 @@ from models.user import User
 from models.job import Job
 from models.job_translations import JobTranslation
 from models.application import Application
+from models.job_translations import JobTranslation
 from schemas.admin import (
     AdminUserBase, AdminUserUpdate,
     AdminApplicationJob,
     AdminJobBase, AdminJobCreate, AdminJobUpdate,
-    JobTranslationUpsert
+    JobTranslationUpsert, JobTranslationBase
 )
 from services.auth_deps import get_current_admin
 
@@ -141,8 +142,7 @@ def admin_list_jobs(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
-    jobs = db.execute(select(Job)).scalars().all()
-    return jobs
+    return db.execute(select(Job)).scalars().all()
 
 
 @admin_router.post("/jobs", response_model=AdminJobBase, status_code=201)
@@ -151,15 +151,11 @@ def admin_create_job(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
-    job = Job(
-        title=payload.title,
-        country=payload.country,
-        city=payload.city,
-        category=payload.category,
-        short_description=payload.short_description,
-        full_description=payload.full_description,
-        is_active=payload.is_active,
-    )
+    data = payload.dict(exclude_unset=True)
+    if "is_active" not in data:
+        data["is_active"] = True
+
+    job = Job(**data)
     db.add(job)
     db.commit()
     db.refresh(job)
@@ -185,8 +181,37 @@ def admin_update_job(
     db.refresh(job)
     return job
 
+@admin_router.get("/jobs/{job_id}", response_model=AdminJobBase)
+def admin_get_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    job = db.get(Job, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
 
 # --- Translations ---
+
+@admin_router.get(
+    "/jobs/{job_id}/translations",
+    response_model=list[JobTranslationBase]
+)
+def get_job_translations(
+    job_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    rows = (
+        db.execute(
+            select(JobTranslation).where(JobTranslation.job_id == job_id)
+        )
+        .scalars()
+        .all()
+    )
+    return rows
+
 
 @admin_router.put("/jobs/{job_id}/translations/{lang_code}")
 def upsert_job_translation(
@@ -201,10 +226,16 @@ def upsert_job_translation(
         raise HTTPException(status_code=404, detail="Job not found")
 
     lang = lang_code.lower()
-    tr = db.execute(
-        select(JobTranslation)
-        .where(JobTranslation.job_id == job_id, JobTranslation.lang_code == lang)
-    ).scalar_one_or_none()
+
+    tr = (
+        db.execute(
+            select(JobTranslation).where(
+                JobTranslation.job_id == job_id,
+                JobTranslation.lang_code == lang,
+            )
+        )
+        .scalar_one_or_none()
+    )
 
     data = payload.dict(exclude_unset=True)
     data["lang_code"] = lang
