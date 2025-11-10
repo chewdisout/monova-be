@@ -1,6 +1,7 @@
 from database import Base
 from sqlalchemy import Column, Integer, Text, String, Float, Boolean, DateTime
 from datetime import datetime, timezone
+from sqlalchemy.orm import relationship
 
 class Job(Base):
     __tablename__ = "jobs"
@@ -50,3 +51,10 @@ class Job(Base):
     is_active = Column(Boolean, default=True, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    translations = relationship(
+        "JobTranslation",
+        back_populates="job",
+        cascade="all, delete-orphan",
+        lazy="selectin",  # instead of "joined"
+    )

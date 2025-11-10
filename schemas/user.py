@@ -30,6 +30,7 @@ class UserOut(BaseModel):
     userPrefferedJobLocation: Optional[str] = None
     userSecondPrefferedJobLocation: Optional[str] = None
     userTellAboutYourSelf: Optional[str] = None
+    isAdmin: bool
 
     class Config:
         from_attributes = True

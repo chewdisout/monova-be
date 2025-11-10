@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, Boolean
 from database import Base
 
 class User(Base):
@@ -22,3 +22,4 @@ class User(Base):
     userTellAboutYourSelf = Column(Text, nullable=True)
     userWorkExperience = Column(Text, nullable=True)
     userEmploymentStatus = Column(String(255), nullable=True)
+    isAdmin = Column(Boolean, nullable=False, server_default="false")

@@ -17,6 +17,7 @@ from services.security import hash_password, verify_password, create_access_toke
 from router.jobs_router import jobs_router
 from router.profile_router import profile_router
 from router.applications_router import application_router
+from router.admin_router import admin_router
 
 app = FastAPI(title="Monova Auth API")
 
@@ -30,6 +31,7 @@ app.add_middleware(
 
 app.include_router(jobs_router, prefix="/jobs", tags=["job"])
 app.include_router(application_router, prefix="/applications", tags=["Applications"])
+app.include_router(admin_router, prefix="/admin", tags=["Admin"])
 app.include_router(profile_router)
 
 @app.on_event("startup")
@@ -49,7 +51,7 @@ def login_user(form_data: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid password.")
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    token = create_access_token(data={"sub": str(user.userId)}, expires_delta=access_token_expires)
+    token = create_access_token(data={"sub": str(user.userId), "isAdmin": user.isAdmin}, expires_delta=access_token_expires)
 
     return {"access_token": token, "token_type": "bearer"}
 
