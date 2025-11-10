@@ -14,7 +14,6 @@ class UserCreate(BaseModel):
     userCitizenship: Optional[str] = None
     userEmploymentStatus: str
 
-
 class UserOut(BaseModel):
     userId: int
     userEmail: EmailStr
@@ -30,7 +29,7 @@ class UserOut(BaseModel):
     userPrefferedJobLocation: Optional[str] = None
     userSecondPrefferedJobLocation: Optional[str] = None
     userTellAboutYourSelf: Optional[str] = None
-    isAdmin: bool
+    isAdmin: bool = Field(False, alias="isAdmin")
 
     class Config:
         from_attributes = True

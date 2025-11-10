@@ -78,7 +78,8 @@ def create_user(payload: UserCreate, db: Session = Depends(get_db)):
         userGender=payload.userGender,
         userPhoneNumber=payload.userPhoneNumber,
         userCitizenship=payload.userCitizenship,
-        userEmploymentStatus = payload.userEmploymentStatus
+        userEmploymentStatus = payload.userEmploymentStatus,
+        isAdmin = False 
     )
 
     db.add(user)
