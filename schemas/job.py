@@ -19,6 +19,7 @@ class JobBase(BaseModel):
     short_description: str
     full_description: str
     is_active: bool = True
+    image: Optional[str] = None
 
 class JobCreate(JobBase):
     pass  # if you want admin create via API

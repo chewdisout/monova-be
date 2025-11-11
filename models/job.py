@@ -51,10 +51,11 @@ class Job(Base):
     is_active = Column(Boolean, default=True, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    image = Column(String(255), nullable=True)
 
     translations = relationship(
         "JobTranslation",
         back_populates="job",
         cascade="all, delete-orphan",
-        lazy="selectin",  # instead of "joined"
+        lazy="selectin",
     )

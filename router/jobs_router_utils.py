@@ -59,6 +59,7 @@ def job_to_dict(job: Job, lang: str | None = None) -> dict:
         "is_active": job.is_active,
         "created_at": job.created_at,
         "updated_at": job.updated_at,
+        "image": job.image
     }
 
     # overlay translatable fields
