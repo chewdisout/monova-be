@@ -25,6 +25,19 @@ def list_jobs(
     lang_resolved = resolve_lang(lang)
     return [job_to_dict(j, lang_resolved) for j in jobs]
 
+@jobs_router.get("ByCategory", response_model=List[JobOut])
+def list_jobs(
+    db: Session = Depends(get_db),
+    category: str | None = Query(None),
+    lang: str | None = Query(None),
+):
+    q = select(Job).where(Job.is_active == True)
+    if category:
+        q = q.where(Job.category == category.upper())
+
+    jobs = db.execute(q).scalars().all()
+    lang_resolved = resolve_lang(lang)
+    return [job_to_dict(j, lang_resolved) for j in jobs]
 
 @jobs_router.get("/{job_id}", response_model=JobOut)
 def get_job(
