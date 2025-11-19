@@ -4,6 +4,7 @@ from models.user_experience import UserExperience
 from models.job import Job
 from models.application import Application
 from models.job_translations import JobTranslation
+from models.email import EmailContact
 
 def create_all_tables():
     print("Creating tables if not exist...")

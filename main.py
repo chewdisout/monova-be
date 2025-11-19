@@ -18,6 +18,7 @@ from router.jobs_router import jobs_router
 from router.profile_router import profile_router
 from router.applications_router import application_router
 from router.admin_router import admin_router
+from router.email_router import email_router
 
 app = FastAPI(title="Monova Auth API")
 
@@ -33,6 +34,7 @@ app.include_router(jobs_router, prefix="/jobs", tags=["job"])
 app.include_router(application_router, prefix="/applications", tags=["Applications"])
 app.include_router(admin_router, prefix="/admin", tags=["Admin"])
 app.include_router(profile_router)
+app.include_router(email_router, prefix="/email", tags=["Email"])
 
 @app.on_event("startup")
 def on_startup():
