@@ -23,3 +23,6 @@ class User(Base):
     userWorkExperience = Column(Text, nullable=True)
     userEmploymentStatus = Column(String(255), nullable=True)
     isAdmin = Column(Boolean, nullable=False, server_default="false")
+
+    cv_s3_key = Column(String, nullable=True)
+    cv_original_name = Column(String, nullable=True)

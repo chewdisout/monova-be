@@ -30,6 +30,8 @@ class UserOut(BaseModel):
     userSecondPrefferedJobLocation: Optional[str] = None
     userTellAboutYourSelf: Optional[str] = None
     isAdmin: bool = Field(False, alias="isAdmin")
+    cv_s3_key: Optional[str] = None
+    cv_original_name: Optional[str] = None
 
     class Config:
         from_attributes = True

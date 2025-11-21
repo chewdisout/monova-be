@@ -1,2 +1,9 @@
 pip install -r requirements.txt
 python create_tables.py
+
+
+export AWS_ACCESS_KEY_ID="AAKIAUSVGBQ3KIUPH3F7C"
+export AWS_SECRET_ACCESS_KEY=S3LxH6SI+qbixPmWSSIrqw/o+gqymtT9ocfrLKX3
+export AWS_REGION="us-east-1"
+export CV_S3_BUCKET="monova-s3-bucket"
+
