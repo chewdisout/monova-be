@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, UniqueConstraint
+from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 
@@ -9,7 +9,7 @@ class Application(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.userId"), nullable=False, index=True)
-    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False, index=True)
+    job_id = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
 
     status = Column(String(32), nullable=False, default="applied")
     created_at = Column(
@@ -26,3 +26,4 @@ class Application(Base):
     # relationships (optional but nice)
     user = relationship("User", backref="applications")
     job = relationship("Job", backref="applications")
+    job = relationship("Job", back_populates="applications")

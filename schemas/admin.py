@@ -19,7 +19,14 @@ class AdminUserUpdate(BaseModel):
     userPhoneNumber: Optional[str] = None
     userCitizenship: Optional[str] = None
     userEmploymentStatus: Optional[str] = None
-    isAdmin: Optional[bool] = None  # if you want to promote/demote
+    userGender: Optional[str] = None
+    userAge: Optional[int] = None
+    userPrefferedJob: Optional[str] = None
+    userSecondPrefferedJob: Optional[str] = None
+    userPrefferedJobLocation: Optional[str] = None
+    userSecondPrefferedJobLocation: Optional[str] = None
+    userTellAboutYourSelf: Optional[str] = None
+    is_admin: Optional[bool] = None  # maps to isAdmin on model
 
 class AdminApplicationJob(BaseModel):
     id: int

@@ -59,3 +59,9 @@ class Job(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+    applications = relationship(
+        "Application",
+        back_populates="job",
+        passive_deletes=True,
+    )

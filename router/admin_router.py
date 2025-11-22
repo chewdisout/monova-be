@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from database import get_db
@@ -81,20 +81,23 @@ def get_user_detail(
         "applications_count": app_count,
     }
 
-
 @admin_router.patch("/users/{user_id}", response_model=AdminUserBase)
-def update_user(
+def admin_update_user(
     user_id: int,
     payload: AdminUserUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
 ):
     user = db.get(User, user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="User not found.")
 
-    for field, value in payload.dict(exclude_unset=True).items():
-        setattr(user, field, value)
+    data = payload.dict(exclude_unset=True)
+
+    for field, value in data.items():
+        if field == "is_admin":
+            user.isAdmin = value
+        else:
+            setattr(user, field, value)
 
     db.add(user)
     db.commit()
@@ -134,6 +137,18 @@ def list_user_applications(
         for r in rows
     ]
 
+@admin_router.delete("/users/{user_id}", status_code=204)
+def admin_delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    db.delete(user)
+    db.commit()
+    return Response(status_code=204)
 
 # --- Jobs ---
 
@@ -191,6 +206,27 @@ def admin_get_job(
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
+
+@admin_router.delete("/jobs/{job_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+):
+    job = (
+        db.execute(
+            select(Job).where(Job.id == job_id)
+        )
+        .scalar_one_or_none()
+    )
+
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found.")
+
+    db.delete(job)
+    db.commit()
+
+    # DB will cascade delete job_translations + applications
+    return Response(status_code=204)
 
 # --- Translations ---
 
