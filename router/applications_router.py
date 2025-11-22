@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 
 from database import get_db
 from models.application import Application
 from models.job import Job
+from models.user import User
 from schemas.application import ApplicationCreate, ApplicationOut, ApplicationWithJobOut
 from services.auth_deps import get_current_user
 
@@ -69,3 +71,29 @@ def get_my_applications(
         .all()
     )
     return apps
+
+@application_router.delete(
+    "/me/{app_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_my_application(
+    app_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    app = (
+        db.execute(
+            select(Application).where(
+                Application.id == app_id,
+                Application.user_id == current_user.userId
+            )
+        )
+        .scalar_one_or_none()
+    )
+
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found.")
+
+    db.delete(app)
+    db.commit()
+    return Response(status_code=204)
